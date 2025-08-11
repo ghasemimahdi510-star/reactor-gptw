@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<title>Lab-Scale Bioreactor HMI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+<div id="app" role="application" aria-label="Lab-Scale Bioreactor HMI">
+
+    <nav role="navigation" aria-label="Main navigation">
+    <a href="#home" role="link" id="nav-home" tabindex="0" aria-current="page">Home</a>
+    <a href="#parameters" role="link" id="nav-parameters" tabindex="0">Parameters</a>
+    <a href="#graphs" role="link" id="nav-graphs" tabindex="0">Graphs</a>
+    <a href="#network" role="link" id="nav-network" tabindex="0">Network</a>
+    <a href="#about" role="link" id="nav-about" tabindex="0">About</a>
+  </nav>
+
+    <main id="main-content" tabindex="-1">
+
+        <section id="home" class="page active" role="region" aria-label="Home page">
+      <div class="content-wrapper">
+
+                <div id="bioreactor-svg-container" aria-label="Bioreactor schematic" role="img" tabindex="0">
+                    <svg id="bioreactor-svg" width="100%" height="480" viewBox="0 0 600 480" role="img" aria-labelledby="svgTitle svgDesc" xmlns="http://www.w3.org/2000/svg" aria-describedby="svgDesc">
+            <title id="svgTitle">Lab-Scale Bioreactor schematic</title>
+            <desc id="svgDesc">3D stylized cylindrical tank with agitator, probes, pipes, valves, liquid level, float indicator, and status lights.</desc>
+
+            <defs>
+                            <linearGradient id="metallicGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#999" />
+                <stop offset="40%" stop-color="#555" />
+                <stop offset="60%" stop-color="#777" />
+                <stop offset="100%" stop-color="#222" />
+              </linearGradient>
+
+                            <radialGradient id="flangeGradient" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0%" stop-color="#ccc" />
+                <stop offset="100%" stop-color="#444" />
+              </radialGradient>
+
+                            <linearGradient id="bladeGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3a3a3a" />
+                <stop offset="100%" stop-color="#111" />
+              </linearGradient>
+
+                            <linearGradient id="liquidGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6CF5A8" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#1E6F4C" stop-opacity="0.8" />
+              </linearGradient>
+
+                            <symbol id="iconSensor" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="#6CF5A8" stroke-width="2" fill="none"/>
+                <path d="M8 12h8" stroke="#6CF5A8" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="8" r="1.5" fill="#6CF5A8"/>
+              </symbol>
+
+                            <symbol id="iconValve" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="8" y="6" width="8" height="12" rx="2" ry="2" fill="#555" stroke="#6CF5A8" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="3" fill="#222" stroke="#6CF5A8" stroke-width="1.5"/>
+              </symbol>
+
+                            <circle id="led_off" r="8" fill="#444" />
+              <circle id="led_green" r="8" fill="var(--accent-green)" />
+              <circle id="led_red" r="8" fill="var(--accent-red)" />
+              <circle id="led_yellow" r="8" fill="var(--accent-yellow)" />
+
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" >
+                <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#FF6B6B"/>
+              </filter>
+            </defs>
+
+                        <g id="tank_body" aria-label="Tank body">
+              <ellipse cx="300" cy="380" rx="140" ry="35" fill="url(#metallicGradient)" />
+              <rect x="160" y="60" width="280" height="320" fill="url(#metallicGradient)" rx="70" ry="35" />
+              <ellipse cx="300" cy="60" rx="140" ry="35" fill="url(#flangeGradient)" />
+              <ellipse cx="300" cy="60" rx="140" ry="35" fill="none" stroke="#888" stroke-width="2" />
+            </g>
+
+                        <clipPath id="tank_fill_mask">
+              <rect id="tank_fill_rect" x="160" y="380" width="280" height="0" />
+            </clipPath>
+
+                        <g id="liquid" clip-path="url(#tank_fill_mask)" aria-label="Liquid inside tank">
+              <rect x="160" y="60" width="280" height="320" fill="url(#liquidGradient)" rx="70" ry="35" />
+              <ellipse cx="300" cy="380" rx="140" ry="35" fill="url(#liquidGradient)" />
+            </g>
+
+                        <g id="agitator" aria-label="Agitator" role="img" transform="translate(300,60)">
+                            <rect x="-35" y="-50" width="70" height="30" rx="6" ry="6" fill="#444" stroke="#666" stroke-width="1" filter="url(#glow)"/>
+              <rect x="-10" y="-65" width="20" height="15" rx="4" ry="4" fill="#666" stroke="#333" stroke-width="1" />
+                            <rect id="agg_shaft" x="-6" y="-20" width="12" height="280" fill="#666" />
+                            <g id="agg_blades" transform="translate(0, 260)" style="transform-origin: 0 0;">
+                <path d="M0 0 L-70 35 L-60 45 L0 15 Z" fill="url(#bladeGradient)" />
+                <path d="M0 0 L70 35 L60 45 L0 15 Z" fill="url(#bladeGradient)" />
+                <path d="M0 0 L0 55 L10 65 L-10 65 L0 55 Z" fill="url(#bladeGradient)" />
+              </g>
+            </g>
+
+                                    <g id="sensor_temp" role="img" aria-label="Temperature probe">
+              <line x1="200" y1="100" x2="140" y2="40" stroke="#6CF5A8" stroke-width="2" />
+              <use href="#iconSensor" x="130" y="30" width="24" height="24" />
+              <text x="115" y="20" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">Temp</text>
+              <text x="120" y="80" fill="#6CF5A8" font-size="18" font-weight="700" id="sensor_temp_value" aria-live="polite" aria-atomic="true" aria-relevant="text">-- °C</text>
+            </g>
+
+                        <g id="sensor_ph" role="img" aria-label="pH probe">
+              <line x1="350" y1="100" x2="410" y2="40" stroke="#6CF5A8" stroke-width="2" />
+              <use href="#iconSensor" x="420" y="30" width="24" height="24" />
+              <text x="425" y="20" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">pH</text>
+              <text x="405" y="80" fill="#6CF5A8" font-size="18" font-weight="700" id="sensor_ph_value" aria-live="polite" aria-atomic="true" aria-relevant="text">--</text>
+            </g>
+
+                        <g id="sensor_do" role="img" aria-label="Dissolved Oxygen probe">
+              <line x1="250" y1="180" x2="190" y2="230" stroke="#6CF5A8" stroke-width="2" />
+              <use href="#iconSensor" x="170" y="230" width="24" height="24" />
+              <text x="140" y="225" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">DO</text>
+              <text x="180" y="275" fill="#6CF5A8" font-size="18" font-weight="700" id="sensor_do_value" aria-live="polite" aria-atomic="true" aria-relevant="text">-- %</text>
+            </g>
+
+                        <g id="inlet_pipe" role="img" aria-label="Inlet pipe">
+              <rect x="100" y="320" width="40" height="16" fill="#444" rx="6" ry="6" />
+              <use href="#iconValve" x="140" y="315" width="40" height="40" class="valve" aria-hidden="true" />
+              <text x="110" y="370" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">Inlet</text>
+            </g>
+
+                        <g id="outlet_pipe" role="img" aria-label="Outlet pipe">
+              <rect x="460" y="320" width="40" height="16" fill="#444" rx="6" ry="6" />
+              <use href="#iconValve" x="460" y="315" width="40" height="40" class="valve" aria-hidden="true" />
+              <text x="470" y="370" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">Outlet</text>
+            </g>
+
+                        <g id="float_level_indicator" role="img" aria-label="Float level indicator">
+                            <rect x="450" y="90" width="20" height="260" fill="#333" rx="8" ry="8" />
+                            <circle id="float_indicator" cx="460" cy="320" r="12" fill="#6CF5A8" stroke="#333" stroke-width="3" />
+              <text x="455" y="85" fill="#6CF5A8" font-size="14" font-weight="600" aria-hidden="true">Level</text>
+            </g>
+
+                        <g id="status_leds" aria-label="Status LEDs" role="img">
+                            <circle id="led_heater" class="led led-off" cx="320" cy="180" r="10" />
+              <text x="335" y="185" fill="#6CF5A8" font-size="12" aria-hidden="true">Heater</text>
+                            <circle id="led_aeration" class="led led-off" cx="320" cy="210" r="10" />
+              <text x="335" y="215" fill="#6CF5A8" font-size="12" aria-hidden="true">Aeration</text>
+                            <circle id="led_agitator" class="led led-off" cx="320" cy="240" r="10" />
+              <text x="335" y="245" fill="#6CF5A8" font-size="12" aria-hidden="true">Agitator</text>
+            </g>
+
+                        <g id="flame_glow" aria-hidden="true" transform="translate(325 170)">
+              <path d="M0 0 C10 -15 20 -15 10 0 C15 5 5 10 0 5 Z" fill="#FF6B6B" filter="url(#glow)" />
+            </g>
+          </svg>
+        </div>
+
+                <aside id="home-info-panel" aria-label="Controls and status">
+
+                    <div class="readouts" role="region" aria-live="polite" aria-atomic="true" aria-relevant="text" aria-label="Live bioreactor parameters">
+            <div class="readout" tabindex="0" aria-describedby="tempDesc">
+              <div class="readout-label" id="tempDesc">Temperature</div>
+              <div class="readout-value" id="tempVal">--</div><span class="readout-unit">°C</span>
+            </div>
+            <div class="readout" tabindex="0" aria-describedby="phDesc">
+              <div class="readout-label" id="phDesc">pH</div>
+              <div class="readout-value" id="phVal">--</div>
+            </div>
+            <div class="readout" tabindex="0" aria-describedby="rpmDesc">
+              <div class="readout-label" id="rpmDesc">RPM</div>
+              <div class="readout-value" id="rpmVal">--</div>
+            </div>
+            <div class="readout" tabindex="0" aria-describedby="levelDesc">
+              <div class="readout-label" id="levelDesc">Liquid Level</div>
+              <div class="readout-value" id="levelVal">--</div><span class="readout-unit">%</span>
+            </div>
+            <div class="readout" tabindex="0" aria-describedby="doDesc" style="grid-column: span 2;">
+              <div class="readout-label" id="doDesc">Dissolved Oxygen</div>
+              <div class="readout-value" id="doVal">--</div><span class="readout-unit">%</span>
+            </div>
+          </div>
+
+                    <div class="controls" role="region" aria-label="Bioreactor controls">
+
+            <button id="btnStart" aria-pressed="false" aria-label="Start bioreactor">Start</button>
+            <button id="btnStop" aria-pressed="false" aria-label="Stop bioreactor">Stop</button>
+
+            <button id="btnHeater" aria-pressed="false" aria-label="Toggle Heater">Heater</button>
+            <button id="btnAeration" aria-pressed="false" aria-label="Toggle Aeration">Aeration</button>
+            <button id="btnAgitator" aria-pressed="false" aria-label="Toggle Agitator">Agitator</button>
+
+            <button id="btnEStop" aria-label="Emergency Stop" aria-live="assertive">E-STOP</button>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+
+        <section id="parameters" class="page" role="region" aria-label="Parameters page">
+      <h2>Set Parameters</h2>
+
+      <form id="paramsForm" novalidate aria-describedby="paramFormDesc">
+        <p id="paramFormDesc" class="sr-only">Use sliders or numeric inputs to set bioreactor parameters, then apply changes.</p>
+
+        <div class="param-row">
+          <label for="setTempInput" class="param-label">Temperature (°C):</label>
+          <div class="param-control">
+            <input type="range" id="setTempInput" min="20" max="45" step="0.1" aria-valuemin="20" aria-valuemax="45" aria-valuenow="--" aria-label="Set temperature in degrees Celsius" />
+            <input type="number" id="setTempNumber" min="20" max="45" step="0.1" aria-label="Numeric input for temperature" />
+          </div>
+        </div>
+
+        <div class="param-row">
+          <label for="setPhInput" class="param-label">pH:</label>
+          <div class="param-control">
+            <input type="range" id="setPhInput" min="4.00" max="10.00" step="0.01" aria-valuemin="4" aria-valuemax="10" aria-valuenow="--" aria-label="Set pH level" />
+            <input type="number" id="setPhNumber" min="4.00" max="10.00" step="0.01" aria-label="Numeric input for pH level" />
+          </div>
+        </div>
+        
+        <div class="param-row">
+          <label for="setRpmInput" class="param-label">Agitator RPM:</label>
+          <div class="param-control">
+            <input type="range" id="setRpmInput" min="0" max="1000" step="10" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="--" aria-label="Set agitator speed in RPM" />
+            <input type="number" id="setRpmNumber" min="0" max="1000" step="10" aria-label="Numeric input for agitator speed" />
+          </div>
+        </div>
+
+        <div class="param-row">
+          <label for="setDoInput" class="param-label">Dissolved Oxygen (%):</label>
+          <div class="param-control">
+            <input type="range" id="setDoInput" min="0" max="100" step="1" aria-valuemin="0" aria-valuemax="100" aria-valuenow="--" aria-label="Set Dissolved Oxygen percentage" />
+            <input type="number" id="setDoNumber" min="0" max="100" step="1" aria-label="Numeric input for Dissolved Oxygen" />
+          </div>
+        </div>
+        
+        <div class="param-row">
+          <label for="setDurationInput" class="param-label">Duration (hh:mm):</label>
+          <div class="param-control" id="durationWrapper">
+            <input type="text" id="setDurationInput" placeholder="hh:mm" pattern="[0-9]{2}:[0-9]{2}" aria-label="Set duration in hours and minutes" />
+          </div>
+        </div>
+
+        <button type="submit" id="btnApplyParams" aria-label="Apply all parameters">Apply Parameters</button>
+      </form>
+    </section>
+
+        <section id="graphs" class="page" role="region" aria-label="Graphs page">
+      <h2>Live Data Graphs</h2>
+      <div id="graph-controls">
+        <div id="graph-toggles" role="group" aria-label="Toggle graph lines">
+          <button class="graph-toggle-btn active" data-dataset="temp">Temp</button>
+          <button class="graph-toggle-btn active" data-dataset="ph">pH</button>
+          <button class="graph-toggle-btn active" data-dataset="do">DO</button>
+          <button class="graph-toggle-btn active" data-dataset="rpm">RPM</button>
+        </div>
+        <div id="graph-options">
+          <select id="time-window-select" aria-label="Select time window">
+            <option value="1">1 Min</option>
+            <option value="5">5 Mins</option>
+            <option value="30" selected>30 Mins</option>
+          </select>
+          <button id="exportCSV">Export CSV</button>
+        </div>
+      </div>
+      <div id="chartContainer" role="img" aria-label="Real-time data charts">
+        <canvas id="bioreactorChart"></canvas>
+      </div>
+    </section>
+    
+        <section id="network" class="page" role="region" aria-label="Network page">
+      <h2>Network Status</h2>
+      <div id="net-info" role="status" aria-live="polite">
+        <span class="net-label">SSID:</span><span id="netSSID" class="net-value">--</span>
+        <span class="net-label">IP:</span><span id="netIP" class="net-value">--</span>
+        <span class="net-label">MAC:</span><span id="netMAC" class="net-value">--</span>
+        <span class="net-label">Status:</span><span id="netStatus" class="net-value">Disconnected</span>
+      </div>
+      <button id="btnScan">Scan & Connect</button>
+      <pre id="net-log" role="log" aria-live="polite" aria-atomic="false">--- System Log ---</pre>
+    </section>
+
+        <section id="about" class="page" role="region" aria-label="About page">
+      <h1>Lab-Scale Bioreactor HMI</h1>
+      <p class="info">Version: 1.0.0 | Date: 2025-08-11</p>
+      <p class="info">Designed and developed by your friendly AI assistant. This HMI is an open-source project for educational and research purposes.</p>
+      <p class="info">The HMI provides real-time monitoring and control of a lab-scale bioreactor, communicating via a WebSocket interface for high-speed data transfer and low latency.</p>
+      <svg class="watermark-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 5 L70 95 L50 75 L30 95 Z" fill="#6CF5A8" />
+        <circle cx="50" cy="50" r="20" fill="#1E1E1E" stroke="#6CF5A8" stroke-width="2"/>
+        <path d="M50 35 L50 65 M35 50 L65 50" stroke="#6CF5A8" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </section>
+  </main>
+
+    <footer role="contentinfo">
+    &copy; 2025 Lab-Scale Bioreactor HMI. All rights reserved.
+  </footer>
+
+    <div id="confirmModal" class="modal-bg" role="dialog" aria-labelledby="confirmModalTitle" aria-describedby="confirmModalDesc">
+    <div class="modal" role="document">
+      <h2 id="confirmModalTitle">Confirm Action</h2>
+      <p id="confirmModalDesc">Are you sure you want to apply these parameters?</p>
+      <div class="modal-buttons">
+        <button id="btnCancelConfirm" class="cancel">Cancel</button>
+        <button id="btnConfirmAction" class="confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <div id="scanModal" class="modal-bg" role="dialog" aria-labelledby="scanModalTitle" aria-describedby="scanModalDesc">
+    <div class="modal" role="document">
+      <h2 id="scanModalTitle">Connect to Network</h2>
+      <p id="scanModalDesc">Enter your network credentials below to connect to the bioreactor via WebSocket.</p>
+      <input type="text" id="ssidInput" placeholder="SSID" aria-label="Network SSID" />
+      <input type="password" id="passwordInput" placeholder="Password" aria-label="Network Password" />
+      <div class="modal-buttons">
+        <button id="btnCancelScan" class="cancel">Cancel</button>
+        <button id="btnConnectScan" class="confirm">Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
